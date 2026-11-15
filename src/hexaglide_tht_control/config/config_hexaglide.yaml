@@ -1,0 +1,41 @@
+workspace:
+  x_limit: [-0.06, 0.06]    # Unit: Meters
+  y_limit: [-0.06, 0.06]
+  z_limit: [-0.08, 0.08]
+  thetax_limit: [-15, 15]   # Unit: Degrees
+  thetay_limit: [-15, 15]
+  thetaz_limit: [-40, 40]
+  deltaX_safe_limit: [55, 55, 55, 15, 15, 40]  # Max absolute change in EEF (mm, deg) [x, y, z, theta_x, theta_y, theta_z]
+  tildaorigin_to_pcb_z: -0.0345  #-0.036 for long pin parts
+
+phidget_param:
+  motor_id: [ [ 0, 681911 ], [ 1, 681911 ], [ 2, 681911 ], [ 0, 682067 ], [ 1, 682067 ], [ 2, 682067 ] ]
+  control_mode: 'pos'   # 'pos': Position control, 'vel': Velocity control
+  encoder_id: [ [ 3, 681911 ], [ 4, 681911 ], [ 5, 681911 ], [ 3, 682067 ], [ 4, 682067 ], [ 5, 682067 ] ]
+  pos_limit_switch_id: [ [ 0, 682056 ], [ 1, 682056 ], [ 2, 682056 ], [ 3, 682056 ], [ 4, 682056 ], [ 5, 682056 ] ]
+  neg_limit_switch_id: [ [ 0, 682057 ], [ 1, 682057 ], [ 2, 682057 ], [ 3, 682057 ], [ 4, 682057 ], [ 5, 682057 ] ]
+  pressure_sensor_id : 568392
+  rescale_factor: 'mm'   # 'deg': degrees/movement, 'rot': rotations/movement, 'rad': radians/movement, 'mm': millimeters/movement
+  # phidget_dict: {motor number: [[motor port#, motor serial#], [encoder port#, encoder serial#], [pos_limit_switch port#, pos_limit_switch serial#], [neg_limit_switch port#, neg_limit_switch serial#]]
+  phidget_dict: {'1' : [[0, 681911], [3, 681911], [0, 682056], [0, 682057]],
+                 '2' : [[1, 681911], [4, 681911], [1, 682056], [1, 682057]],
+                 '3' : [[2, 681911], [5, 681911], [2, 682056], [2, 682057]],
+                 '4' : [[0, 682067], [3, 682067], [3, 682056], [3, 682057]],
+                 '5' : [[1, 682067], [4, 682067], [4, 682056], [4, 682057]],
+                 '6' : [[2, 682067], [5, 682067], [5, 682056], [5, 682057]]}
+
+hexaglide_param:
+  max_velocity_constant: 15.0
+  max_acceleration_constant: 5.0
+  joint_max_velocity: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]    # mm/s
+  joint_max_acceleration: [ 50.0, 50.0, 50.0, 50.0, 50.0, 50.0 ]    # mm/s^2
+  init_rotation_eef_base: [0, 0, -30]   # [theta_x, theta_y, theta_z] (Units: degrees) The initial rotation between EEF and base coordinates system
+
+
+referencing_param:
+#  joints_zero_error: [ 0.4, 0.1, 0.7, 0.6, 1.3, 0.45 ]   # Displacement error compensation for bottom limit switches (Move all joints above 20mm the bottom plate)
+#  joints_zero_error: [ 0.6, 0.3, 0.9, 0.8, 1.5, 0.65 ]
+  joints_zero_error: [ 1.3, 1.0, 1.6, 1.5, 2.2, 1.35 ]   # Displacement error compensation for bottom limit switches (Move all joints above 20mm the bottom plate)
+  reference_joint_position: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]    # Joint position after referencing (mm)
+  reference_eef_pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]    # EEF position after referencing [x, y, z (mm), theta_x (degrees), theta_y, theta_z]
+

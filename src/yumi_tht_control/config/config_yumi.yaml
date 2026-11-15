@@ -1,0 +1,59 @@
+env_param:
+  n_actions: 5  #RL action space, 12 to include orientation as action, 6 to include upward motion
+  action_dict: {
+            '0': 'FRONT',
+            '1': 'BACK',
+            '2': 'RIGHT',
+            '3': 'LEFT',
+            '4': 'DOWN',
+            '5': 'UP',
+            '6': 'YAW_N',
+            '7': 'YAW_P',
+            '8': 'ROLL_P',
+            '9': 'ROLL_N',
+            '10': 'PITCH_P',
+            '11': 'PITCH_N',
+  }
+  n_observations: 4 #RL observation space
+  translation_step_mm: 0.5 # 0.5
+  rotation_step_deg: 2
+  image_as_input_without_cv: False
+  metallic_pixel_detection: True
+  diff_image_as_input: False
+  pressure_hist_as_obs: False
+  orientation_as_euler: False
+  goal_error_coords: "Pixel" #Choose between "Pixel" and "EEF"
+  max_step_count: 20
+  max_pressure: 500 # 250
+  max_depth: -1.5 # -1.0
+  click_goal_image: False  # Boolean: True for selecting goal position in image
+  # Default selected goal in pixel values. Adjust when goal is changed.
+  goal_pixel_img1: [(546, 602)]
+  goal_pixel_img2: [(557, 614)]
+
+ros_param:
+  img1_pub: '/cam_1/color/image_raw'
+  img2_pub: '/cam_2/color/image_raw'
+  cropped_img1_pub: 'cropped_img1'
+  cropped_img2_pub: 'cropped_img2'
+  action_pub: 'action'
+  eef_state_pub: '/eef_state_yumi'  # Defined in robot_state_publisher.py
+
+robot_workspace:
+  # [min, max]
+  x_limit: [-0.0015, 0.0015]    # Unit: Meters
+  y_limit: [-0.0015, 0.0015]
+  z_limit: [0.2273, 0.32603]
+  thetax_limit: [-15, 15]   # Unit: Degrees
+  thetay_limit: [-15, 15]
+  thetaz_limit: [-40, 40]
+  tildaorigin_to_pcb_z: -0.0345  #-0.036 for long pin parts
+
+log_param:
+  output_dir: "testlogsmartassembly_yumi"
+
+cropped_image_pixels:
+  # h: 40 # Long pins (RL)
+  h: 20 # Short pins (VSI)
+  w: 40
+

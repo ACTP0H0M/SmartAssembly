@@ -1,0 +1,228 @@
+#!/usr/bin/env python3
+import copy
+
+from hexaglide_tht_control.robot import Hexaglide
+import rospy
+from std_msgs.msg import Int64, Float64MultiArray, Bool
+from tht_control.common import *
+from tht_control.utils import *
+import numpy as np
+import math as m
+import argparse
+
+
+class Visual_servo_cmd():
+    def __init__(self, robot_type, robot):
+        self.robot = robot
+        config_file_name, self.robot_type = load_config_file(robot_type)
+        ros_param_path = load_ros_params(rospackage_name="tht_control", rel_path_from_package_to_file='config',
+                                         yaml_file_name=config_file_name)
+        self.translation_stepsize = rospy.get_param('/env_param/translation_step_mm') / 1000.0
+        self.rotation_stepsize = rospy.get_param('/env_param/rotation_step_deg') * m.pi / 180.0
+        self.approach_success_pub = rospy.Publisher('approach_success', Bool, queue_size=1)
+        self.action_dict = rospy.get_param('/env_param/action_dict')
+        self.robot_workspace_x = rospy.get_param('/robot_workspace/x_limit')
+        self.robot_workspace_y = rospy.get_param('/robot_workspace/y_limit')
+
+    def visual_servo_cmd_callback(self, eef_cmd):
+        """
+        For Hexaglide, this method is basically a wrapper of setEEFPose
+        """
+        eef_cmd = eef_cmd.data
+        print("visual_servo_cmd_callback(): change in x y z =", eef_cmd)
+        if abs(eef_cmd[0]) > 0.06 or abs(eef_cmd[1]) > 0.06 or abs(eef_cmd[2]) > 0.06:
+            rospy.logerr("visual_servo_cmd_callback(): abort recommended, because change in x,y,z is too high (bigger than 6 cm!)")
+            # warnings.warn("Abort recommended, because change in x,y,z is too high (bigger than 6cm!)")
+        self.robot.getEEFState()
+        eef_position, eef_orientation = self.robot.getEEFState()
+        print("visual_servo_cmd_callback(): current eef pose =", eef_position)
+        # First 3 components are treated as new desired x,y,z position coordinates
+        eef_position[0] = eef_cmd[0]
+        eef_position[1] = eef_cmd[1]
+        eef_position[2] = eef_cmd[2]
+        # Remaining 4 components are treated as new desired orientation (quaternion)
+        if len(eef_cmd) > 3:
+            eef_orientation[0] = eef_cmd[3]
+            eef_orientation[1] = eef_cmd[4]
+            eef_orientation[2] = eef_cmd[5]
+            eef_orientation[3] = eef_cmd[6]
+
+        if len(eef_cmd) == 8:
+            if not bool(eef_cmd[7]):
+                usr_input = 'y'
+            else:
+                usr_input = input('Continue to command calculation? y/n: ')
+        else:
+            usr_input = input('Continue to command calculation? y/n: ')
+
+        eef_cmd = np.concatenate((eef_position, eef_orientation), axis=0)
+        print("visual_servo_cmd_callback(): sending eef_cmd to robot.setEEFPose() =", eef_cmd)
+
+        approach_success_message = Bool()
+        if usr_input == 'y':
+            approach_success_message.data = self.robot.setEEFPose(eef_cmd)
+            # approach_success_message.data = True
+            self.approach_success_pub.publish(approach_success_message)
+            print('')
+            print("visual_servo_cmd_callback(): movement successful")
+        else:
+            approach_success_message.data = False
+            self.approach_success_pub.publish(approach_success_message)
+            print("visual_servo_cmd_callback(): movement failed")
+
+    def action_callback(self, msg):
+        action = msg.data
+        acceleration_cmd_temp = None
+        if self.robot_type == 'hexaglide':
+            acceleration_cmd_temp = copy.copy(self.robot.joint_max_acceleration)   # save current acceleration command
+            self.robot.joint_max_acceleration = [5.0, 5.0, 5.0, 5.0, 5.0, 5.0]  # mm/s^2
+        # save new eef position
+        self.robot.getEEFState()
+        current_eef_pose, current_eef_orientation = self.robot.getEEFState()
+        print('action_callback(): current_eef_pose =', current_eef_pose)
+        print('action_callback(): current_eef_orientation =', current_eef_orientation)
+        estimated_new_eef = None
+        print('\naction_callback(): translation step size [m] =', self.translation_stepsize)
+        print('action_callback(): rotation step size [rad]', self.rotation_stepsize)
+        print('action_callback(): RL ACTION: ', self.action_dict[str(action)])
+        if action == 0:
+            estimated_new_eef = self.robot.moveAlongTCPAxisCalculateNewEEF(self.translation_stepsize, axis='x')
+        elif action == 1:
+            estimated_new_eef = self.robot.moveAlongTCPAxisCalculateNewEEF(-self.translation_stepsize, axis='x')
+        elif action == 2:
+            estimated_new_eef = self.robot.moveAlongTCPAxisCalculateNewEEF(self.translation_stepsize, axis='y')
+        elif action == 3:
+            estimated_new_eef = self.robot.moveAlongTCPAxisCalculateNewEEF(-self.translation_stepsize, axis='y')
+        elif action == 4:
+            estimated_new_eef = self.robot.moveAlongTCPAxisCalculateNewEEF(-self.translation_stepsize, axis='z')
+        elif action == 5:
+            estimated_new_eef = self.robot.moveAlongTCPAxisCalculateNewEEF(self.translation_stepsize, axis='z')
+        elif action == 6:
+            estimated_new_eef = self.robot.rotateAlongTCPAxisCalculateNewEEF(-self.rotation_stepsize, axis='z')
+        elif action == 7:
+            estimated_new_eef = self.robot.rotateAlongTCPAxisCalculateNewEEF(self.rotation_stepsize, axis='z')
+        elif action == 8:
+            estimated_new_eef = self.robot.rotateAlongTCPAxisCalculateNewEEF(self.rotation_stepsize, axis='x')
+        elif action == 9:
+            estimated_new_eef = self.robot.rotateAlongTCPAxisCalculateNewEEF(-self.rotation_stepsize, axis='x')
+        elif action == 10:
+            estimated_new_eef = self.robot.rotateAlongTCPAxisCalculateNewEEF(self.rotation_stepsize, axis='y')
+        elif action == 11:
+            estimated_new_eef = self.robot.rotateAlongTCPAxisCalculateNewEEF(-self.rotation_stepsize, axis='y')
+        elif action == 12:
+            estimated_new_eef = self.robot.moveAlongTCPAxisCalculateNewEEF(2*self.translation_stepsize, axis='x')
+        elif action == 13:
+            estimated_new_eef = self.robot.moveAlongTCPAxisCalculateNewEEF(-2*self.translation_stepsize, axis='x')
+        elif action == 14:
+            estimated_new_eef = self.robot.moveAlongTCPAxisCalculateNewEEF(2*self.translation_stepsize, axis='y')
+        elif action == 15:
+            estimated_new_eef = self.robot.moveAlongTCPAxisCalculateNewEEF(-2*self.translation_stepsize, axis='y')
+        elif action == 999:
+            approach_success_message = Bool()
+            approach_success_message.data = False
+            self.approach_success_pub.publish(approach_success_message)
+            # pass # this will skip the following code in this case
+        else:
+            raise ValueError('Action is not known. Provide action equal or less 11')
+        print('action_callback(): estimated_new_eef =', estimated_new_eef)
+        action_success_message = Bool()
+        workspace_x_violation = False if current_eef_pose[0] + self.robot_workspace_x[0] < estimated_new_eef[0] < \
+                                         current_eef_pose[0] + self.robot_workspace_x[1] else True
+        workspace_y_violation = False if current_eef_pose[1] + self.robot_workspace_y[0] < estimated_new_eef[1] < \
+                                         current_eef_pose[1] + self.robot_workspace_y[1] else True
+        if not workspace_x_violation and not workspace_y_violation:
+            action_success_message.data = self.robot.setEEFPose(estimated_new_eef)
+            if self.robot_type == 'hexaglide':
+                self.robot.joint_max_acceleration = acceleration_cmd_temp
+            print('action_callback(): action_success_message.data =', action_success_message.data)
+            self.approach_success_pub.publish(action_success_message)
+            print('action_callback(): action executed Successfully!')
+        else:
+            action_success_message.data = False
+            self.approach_success_pub.publish(action_success_message)
+            print('action_callback(): action would lead to exceeding safe workspace limits')
+
+    def move_to_pose_callback(self, msg):
+        print('move_to_pose_callback()')
+        eef_cmd = msg.data
+        eef_position_cmd = eef_cmd[:3]
+        eef_orientaion_cmd = eef_cmd[3:]
+        theta_x, theta_y, theta_z = euler_from_quaternion_theta(eef_orientaion_cmd)  # Units: radians
+        goal_theta_x = theta_x * (180 / m.pi)
+        goal_theta_y = theta_y * (180 / m.pi)
+        goal_theta_z = theta_z * (180 / m.pi)  # Units: degrees
+        goal_cmd = [eef_position_cmd[0] * 1000, eef_position_cmd[1] * 1000, eef_position_cmd[2] * 1000,
+                    goal_theta_x, goal_theta_y, goal_theta_z]
+        start_position_0 = self.robot.init_translation_vector
+        start_position_0[2] = start_position_0[2] + 5   # units: mm
+        start_rotation_0 = self.robot.init_rotation_matrix
+        movement_success = Bool()
+        movement_success.data = self.robot.move_to_pose(goal_cmd, start_rotation_0, start_position_0, cnt=None, variable_vel=False,
+                                      wait_for_input=True)
+        self.approach_success_pub.publish(movement_success)
+
+    def move_to_joint_pose_callback(self, msg):
+        print('move_to_joint_pose_callback()')
+        if msg.data:
+            approach_joint_pose = self.robot.joint_position[-1]
+            success = Bool()
+            success.data = self.robot.move_to_joint_pose(approach_joint_pose, variable_vel=False, wait_for_input=True)
+            self.approach_success_pub.publish(success)
+
+    def record_joint_pos_callback(self, msg):
+        print('record_joint_pos_callback()')
+        if msg.data:
+            self.robot.recordJointPosition()
+
+    def rl_init_pose_callback(self, msg):
+        print('\nrl_init_pose_callback()')
+        euler_rad = euler_from_quaternion(msg.data[3], msg.data[4], msg.data[5], msg.data[6])
+        eef_pose_for_getEEFState = [msg.data[0]*1000,
+                                       msg.data[1]*1000,
+                                       msg.data[2]*1000,
+                                       euler_rad[0]*180/m.pi,
+                                       euler_rad[1]*180/m.pi,
+                                       euler_rad[2]*180/m.pi]
+        print('rl_init_pose_callback(): setting robot.current_eef_pose to ', eef_pose_for_getEEFState)
+        self.robot.current_eef_pose = eef_pose_for_getEEFState
+
+if __name__ == '__main__':
+    robot_type = 'hexaglide'
+    rospy.init_node('hexaglide', anonymous=True)
+    config_file_name, robot_type = load_config_file(robot_type)
+    ros_param_path = load_ros_params(rospackage_name='tht_control',
+                                     rel_path_from_package_to_file='config', yaml_file_name=config_file_name)
+    eef_state_pub = rospy.get_param('/ros_param/eef_state_pub')
+    joint_pub = rospy.Publisher('/joint_state_left_arm', Float64MultiArray, queue_size=10)
+    eef_pub = rospy.Publisher(eef_state_pub, Float64MultiArray, queue_size=10)
+    robot = Hexaglide()
+    v = Visual_servo_cmd(robot_type, robot)
+    sub_visual_servo_cmd = rospy.Subscriber('/visual_servo_cmd', Float64MultiArray, v.visual_servo_cmd_callback)
+    sub_action = rospy.Subscriber('/action', Int64, v.action_callback)
+    move_to_pose_sub = rospy.Subscriber('/move_to_pose_hexaglide', Float64MultiArray, v.move_to_pose_callback)
+    move_to_approach_pose_sub = rospy.Subscriber('/move_to_joint_pose', Bool, v.move_to_joint_pose_callback)
+    record_joint_pos_sub = rospy.Subscriber('/record_joint_pos', Bool, v.record_joint_pos_callback)
+    rl_init_pose_sub = rospy.Subscriber('/rl_init_pose', Float64MultiArray, v.rl_init_pose_callback)
+    reference_input = input('Reference the motors? y/n')
+    if reference_input == 'y':
+        reference_success = robot.doReference([2.5, 2.5, 2.5, 2.5, 2.5, 2.5])
+        robot.current_eef_pose = [0, 0, 0, 0, 0, 0]
+        if not reference_success:
+            print('Referencing unsuccessful. Exiting...')
+            exit(0)
+    else:
+        usr_input = input('Continue without referencing? y/n')
+        if not usr_input == 'y':
+            print('Exiting...')
+            exit(0)
+        else:
+            print('Resetting EEF Current Position to [x, y, z, thetaX, thetaY, thetaZ]: [0, 0, 0, 0, 0, 0]')
+            robot.current_eef_pose = [0, 0, 0, 0, 0, 0]
+
+    while not rospy.is_shutdown():
+        eef_position, eef_orientation = robot.getEEFState()
+        eef_pose = Float64MultiArray()
+        eef_pose.data = eef_position + eef_orientation
+        eef_pub.publish(eef_pose)
+
+

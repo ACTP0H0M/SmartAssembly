@@ -1,0 +1,8 @@
+prefix=/home/ips/smartassembly/devel
+
+Name: phidget_sensor
+Description: Description of phidget_sensor
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

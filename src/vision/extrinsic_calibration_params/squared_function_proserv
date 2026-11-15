@@ -1,0 +1,48 @@
+First Attempt:
+---------------------------
+Fitting function to get x_tilda from image 2 pixel coordinates...
+Optimal parameters:
+[-1.01746513e-05  8.30330200e-01  1.27434190e-04  6.44796545e-01
+ -1.23730071e-03 -4.84066798e+02]
+Condition number of covariance matrix:
+9.042241133527042e+16
+
+Fitting function to get y_tilda from image 1 pixel coordinates...
+Optimal parameters:
+[-1.69101907e-07 -6.35576651e-01 -1.72032051e-04 -4.02577061e-01
+  9.34526474e-04  3.50945025e+02]
+Condition number of covariance matrix:
+2.39178216379957e+16
+
+Second Attempt:
+---------------------------
+Fitting function to get x_tilda from image 2 pixel coordinates...
+Optimal parameters:
+[-1.13067344e-05  8.10229103e-01  3.41934151e-04  3.77591660e-01
+ -1.18898008e-03 -4.06075064e+02]
+Condition number of covariance matrix:
+9.148648289578373e+16
+
+Fitting function to get y_tilda from image 1 pixel coordinates...
+Optimal parameters:
+[-1.64230505e-05 -6.05116639e-01 -1.35816308e-04 -4.22553858e-01
+  9.13657167e-04  3.45861420e+02]
+Condition number of covariance matrix:
+2.079609420100835e+16
+
+
+---------------------------
+Fitting function to get x_tilda from image 2 pixel coordinates...
+Optimal parameters:
+[-5.56733930e-06  7.25453787e-01  5.38153297e-04  9.37010318e-02
+ -1.05495191e-03 -3.04990501e+02]
+Condition number of covariance matrix:
+1.0984319160045131e+17
+
+Fitting function to get y_tilda from image 1 pixel coordinates...
+Optimal parameters:
+[-7.03181106e-06 -5.80543813e-01 -1.79728026e-04 -3.30294623e-01
+  8.43595920e-04  3.13377847e+02]
+Condition number of covariance matrix:
+2.0089199113168864e+16
+

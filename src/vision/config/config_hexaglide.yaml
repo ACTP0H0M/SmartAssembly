@@ -1,0 +1,37 @@
+ros_param:
+  camera_id: ['cam_1', 'cam_2']
+#  waypoint_list_filename: 'waypoints/2023-05-17-15-45-02_waypoints'  # Waypoint to Cameras position
+  insertion_waypoint_list_filename: 'waypoints/2023-05-17-15-45-02_waypoints'  # Waypoint to Cameras position
+  grasp_waypoint_list_filename: 'waypoints/2023-10-31-15-04-22_waypoints'   # Waypoints to grasping intermediate position
+  weights_list_filename: 'sensor_weights/2023-01-11-16-33-36_weights'
+
+# TODO: Adjust extrinsic parameters according to hexaglide setup
+extrinsic_params:
+  d1: 113.5   # Distance from beam corner to camera 1 (114+-0.5)
+  d2: 113.5   # Distance from beam corner to camera 2 (114+-0.5)
+  x_hat_c1: 11.0  #28.7   # x-cordinate for camera 1 lens focal point in beam-corner coordinates
+  y_hat_c2: 11.0  #28.7    # y-cordinate for camera 2 lens focal point in beam-corner coordinates
+  z_hat: 20.5       #30.3 # z-coordinate of optical axis intersection in beam-corner coordinates
+  rot_tilda_to_base: [[0, 1, 0], [-1, 0, 0], [0, 0, 1]]
+  vertical_shift_cam1: 0  # 15 Tilt towards the PCB means corrected vertical pixel coordinate should be increased
+  vertical_shift_cam2: 0  # -8
+  horizontal_shift_cam1: 0
+  horizontal_shift_cam2: 0
+ # For linear correction function for clicking goal on Green PCB
+#  x_tilda_params: [1.36087184e-01, -5.10795988e-02, -5.76746288e+01]
+#  y_tilda_params: [-1.28039147e-01, 4.49296487e-02, 5.60704760e+01]
+
+# For squared correction function for clicking goal on Green PCB
+#  x_tilda_params: [-2.58677429e-06, 6.83773270e-01, 2.35981789e-04, 3.50842722e-01, -9.57156838e-04, -3.63399884e+02]
+#  y_tilda_params: [-3.32814599e-06, -5.69156974e-01, -2.11339776e-04, -2.67889400e-01, 7.91072122e-04, 2.97915408e+02]
+
+# For squared correction function for clicking goal on ProServ PCB
+  x_tilda_params: [ -5.56733930e-06, 7.25453787e-01, 5.38153297e-04, 9.37010318e-02, -1.05495191e-03, -3.04990501e+02 ]
+  y_tilda_params: [ -7.03181106e-06, -5.80543813e-01, -1.79728026e-04, -3.30294623e-01, 8.43595920e-04, 3.13377847e+02 ]
+
+image_roi:
+  scale_x: 0.6  # Width of ROI in relation to image width
+  scale_y: 0.6  # Height of ROI in relation to image height
+  x_roi: [[540, 860], [465, 840]]
+  y_roi: [[150, 400], [130, 440]]
+

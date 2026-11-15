@@ -1,0 +1,27 @@
+tht_components:
+  # THT Component ID: [Component package, Number of pins, Pins separation]
+  # Component types: SIP (Single in-line package), DIP (Dual in-line package, misc)
+  component_dict: {
+    'N': ['SIP', 2, 0.0051],
+    'G': ['SIP', 2, 0.00762],
+    'WE-S': ['SIP', 2, 0.0075],
+    'S': ['SIP', 2, 0.0050],
+    'E': ['SIP', 2, 0.0020],
+    'F': ['SIP', 2, 0.0050],
+    'A': ['SIP', 2, 0.0077],
+    'D': ['SIP', 2, 0.0076],
+    'T3.15': ['SIP', 2, 0.0060],
+    'T': ['DIP', 9, 0.00194],
+    'U': ['DIP', 6, 0.0034],
+    'K': ['DIP', 8, 0.0038],
+    'W': ['DIP', 5, 0.0050],
+    'ProServ_Diode': ['SIP', 2, 0.009]
+  }
+
+insertion_plan:
+  insert_single_part: True
+  part_ID: 'G'
+  THT_insertion_sequence: []
+  # Angle w.r.t. cam2 that needs to be reoriented (0 degrees if holes are parallel to cam2 line of sight)
+  # Angle is positive for CW rotation of the platform about z-axis of H1
+  part_reorientation_angle: 0 # Degrees

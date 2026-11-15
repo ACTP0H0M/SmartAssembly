@@ -1,0 +1,14 @@
+tht_components:
+  # THT Component: [Pin separation, Component type]
+  # Component types: SIP (Single in-line package), DIP (Dual in-line package, misc)
+  component_dict: {
+    'N': [5.10/1000, 'SIP],
+    'G': [7.62/1000, 'SIP'],
+    'WE-S': [7.5/1000, 'SIP'],
+    'S': [5.0/1000, 'SIP'],
+    'E': [2.0/1000, 'SIP'],
+    'F': [5.0/1000, 'SIP'],
+    'A': [7.7/1000, 'SIP'],
+    'D': [7.6/1000, 'SIP'],
+    'T3.15': [6.0/1000, 'SIP']
+  }

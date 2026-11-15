@@ -1,0 +1,51 @@
+ros_param:
+  camera_id: ['cam_1', 'cam_2']
+#  waypoint_list_filename: 'waypoints/2023-05-17-15-45-02_waypoints'  # Waypoint to Cameras position
+  insertion_waypoint_list_filename: 'waypoints/2023-05-17-15-45-02_waypoints'  # Waypoint to Cameras position
+  grasp_waypoint_list_filename: 'waypoints/2023-10-31-15-04-22_waypoints'   # Waypoints to grasping intermediate position
+  DIP_waypoint_list_filename: 'waypoints/2023-12-06-16-22-32_waypoints'
+  weights_list_filename: 'sensor_weights/2023-01-11-16-33-36_weights'
+
+extrinsic_params:
+  d1: 80.1   # Distance from beam corner to camera 1
+  d2: 125.0   # Distance from beam corner to camera 2
+  x_hat_c1: 27.5  #29   # x-cordinate for camera 1 lens focal point in beam-corner coordinates
+  y_hat_c2: 29.0  #29.5    # y-cordinate for camera 2 lens focal point in beam-corner coordinates
+  z_hat: 30.3       #30.3 # z-coordinate of optical axis intersection in beam-corner coordinates
+  rot_tilda_to_base: [[0, 1, 0], [-1, 0, 0], [0, 0, 1]]
+  vertical_shift_cam1: 0
+  vertical_shift_cam2: 0
+
+image_roi:
+  scale_x: 0.6  # Width of ROI in relation to image width
+  scale_y: 0.6  # Height of ROI in relation to image height
+  x_roi: [[440, 740], [465, 840]]
+  y_roi: [[150, 460], [130, 440]]
+
+collision_boxes:
+  # Right Wall
+  # xz_center_point: [0.374, 0.0994, 0.1431]
+  xz_center_point: [0.474, 0.0994, 0.1]
+  xz_size: [0.328, 0.01, 0.35]
+
+  # Back Wall
+  # yz_center_point: [0.36, 0.0072, 0.1433]
+  yz_center_point: [0.33, 0.0072, 0.1]
+  yz_size: [0.01, 0.35, 0.35]
+
+  # Left Wall
+  xz_r_center_point: [0.474, -0.12, 0.1]
+  xz_r_size: [0.328, 0.01, 0.35]
+
+  # Front Wall
+  # yz_center_point: [0.36, 0.0072, 0.1433]
+  yz_f_center_point: [ 0.6, 0.0072, 0.1]
+  yz_f_size: [ 0.01, 0.35, 0.35 ]
+
+  # Top Wall
+  xy_center_point: [0.43, 0.0, 0.62]
+  xy_size: [0.328, 0.35, 0.01]
+
+  light_collision_center: [0.2044, 0.2219, 0.25804]
+  light_collision_size: [0.2, 0.1, 0.2]
+

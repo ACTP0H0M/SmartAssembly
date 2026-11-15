@@ -1,0 +1,8 @@
+prefix=/home/ips/smartassembly/devel
+
+Name: yumi_tht_control
+Description: Description of yumi_tht_control
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

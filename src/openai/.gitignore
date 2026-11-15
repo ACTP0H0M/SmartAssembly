@@ -1,0 +1,3 @@
+*.pyc
+.~*
+yumi_openai/doc/.idea/
