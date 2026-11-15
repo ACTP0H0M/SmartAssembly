@@ -1,6 +1,6 @@
 # **SmartAssembly**
 
-**Code described in the PhD thesis ``Flexible Multi-Sensory Robotic Systems for THT Assembly in Low-Volume High-Mix Production'' by Mikhail Polikarpov (2026).**
+**Code described in the PhD thesis "Flexible Multi-Sensory Robotic Systems for THT Assembly in Low-Volume High-Mix Production" by Mikhail Polikarpov (2026).**
 
 An experimental framework for low-cost robotic assembly of Printed Circuit Board (PCB) with through-hole devices (THD), supported for any robot that has Cartesian control and Robot Operating System (ROS) support.
 
