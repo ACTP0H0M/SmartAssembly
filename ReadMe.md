@@ -99,8 +99,6 @@ You will need access to the lab PC (Dell Precision Tower 7910) and a laptop with
 
 Turn on the lab PC and wait till GRUB gives you boot options. Select "Ubuntu".
 
-Login with the password (which also gives sudo rights): ``$martA$$embly`` 
-
 The best way to launch the project is to navigate to the ``pycharm...`` folder in home directory, then go to ``bin`` folder, open terminal and enter the command to start PyCharm with sudo access:
 ```
 sudo ./pycharm.sh
